@@ -3,4 +3,4 @@
 	url = https://github.com/tumasgiu/CWin32.git
 [submodule "Win32"]
 	path = Win32
-	url = git@github.com:tumasgiu/Win32.git
+	url = https://github.com/tumasgiu/Win32.git
