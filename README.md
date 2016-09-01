@@ -3,12 +3,7 @@ Tested on Cygwin 2.5.2 with
 
 Compile the Win32 Swift library :  
 
-```
- swiftc -force-single-frontend-invocation -emit-library -I /usr/include/ -I /usr/include/w32api/ -I CWin32/ -module-name "Win32" Win32/MessageBox.swift Win32/Application.swift
-```
-
-> Without the `-force-single-frontend-invocation` flag, multiple definitions
-errors occurs
+`swiftc -force-single-frontend-invocation -parse-as-library -emit-library -I /usr/include/ -I /usr/include/w32api/ -I CWin32/ -module-name "Win32" Win32/Sources/*`
 
 Now we should have a `libWin32.dll` in working directory  
 
