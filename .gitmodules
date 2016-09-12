@@ -1,6 +1,0 @@
-[submodule "CWin32"]
-	path = CWin32
-	url = https://github.com/tumasgiu/CWin32.git
-[submodule "Win32"]
-	path = Win32
-	url = https://github.com/tumasgiu/Win32.git
