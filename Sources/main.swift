@@ -34,59 +34,58 @@ class AppDelegate: ApplicationDelegate {
         return menu
     }
 
-    func main() {
-
-        print("instance : \(Application.shared.hInstance.pointee)")
-
-        do {
-            let wc = try WindowClass(identifier: "MainWindow") { hwnd, messageCode, wParam, lParam in
-                //print("code : \(String(messageCode, radix: 16)) , message: \(SystemMessage.WindowManager(rawValue: messageCode))")
-
-                guard let message = SystemMessage.WindowManager(rawValue: messageCode)
-                else {
-                    return DefWindowProcW(hwnd, messageCode, wParam, lParam)
-                }
-
-                switch message {
-                    case .paint:
-                        var ps = PAINTSTRUCT()
-                        let hdc = BeginPaint(hwnd, &ps)
-                        EndPaint(hwnd, &ps)
-                    case .command:
-                        switch wParam {
-                            case 1001:
-                                DestroyWindow(hwnd)
-                            case 1002:
-                                MessageBox(message: "W32Experiment\nWritten in Swift", title: "About").display()
-                            default:
-                                return DefWindowProcW(hwnd, messageCode, wParam, lParam)
-                        }
-                    case .destroy:
-                        PostQuitMessage(0)
-                    default:
-                        return DefWindowProcW(hwnd, messageCode, wParam, lParam)
-                }
-
-                return DefWindowProcW(hwnd, messageCode, wParam, lParam)
+    class MainWindowDelegate: WindowClassDelegate {
+        func onPaint(window: Window) {
+            var rect = window.clientRect
+            window.paint { context in
+                context.drawText("Hello Swifty Window !", inRect: &rect, options: [.singleLine, .center, .centerVertically])
             }
+        }
+        func onDestroy(window: Window) -> Bool {
+            exit(0)
+            return true
+        }
+        func onCommand(param: UInt64) {
+            switch param {
+                case 1001:
+                    exit(0)
+                case 1002:
+                    MessageBox(message: "W32Experiment\nWritten in Swift", title: "About").display()
+                default:
+                    break
+            }
+        }
+    }
 
-            let window = try Window(class: wc)
+    let mainWindowDelegate = MainWindowDelegate()
+
+    var mainWindow: Window!
+
+    func main() {
+        do {
+            let wc = WindowClass(identifier: "MainWindow")
+            wc.delegate = mainWindowDelegate
+
+            try wc.register()
+
+            mainWindow = try Window(class: wc)
 
             let menu = try createMenu()
 
-            SetMenu(window.handle, menu)
+            SetMenu(mainWindow.handle, menu)
 
-            window.display()
-
-            window.title = "Hëllœ"
         } catch {
             let mBox = MessageBox(message: "\(error)")
             mBox.display()
-            PostQuitMessage(1)
+            exit(1)
         }
+
+        mainWindow.display()
+        mainWindow.title = "Hëllœ"
     }
 }
 
 let delegate = AppDelegate()
 Application.delegate = delegate
+
 Application.run()
