@@ -1,5 +1,6 @@
 import CWin32
 import Win32
+import GDI
 
 class AppDelegate: ApplicationDelegate {
 
@@ -35,6 +36,10 @@ class AppDelegate: ApplicationDelegate {
     }
 
     class MainWindowDelegate: WindowClassDelegate {
+
+        var draw = false
+        var previousPoint: Point = Point.zero
+
         func onPaint(window: Window) {
             var rect = window.clientRect
             window.paint { context in
@@ -53,6 +58,31 @@ class AppDelegate: ApplicationDelegate {
                     MessageBox(message: "W32Experiment\nWritten in Swift", title: "About").display()
                 default:
                     break
+            }
+        }
+        func onMouseEvent(_ event: MouseEvent, at point: Point, in window: Window) {
+            switch event {
+            case .buttonDown:
+                draw = true
+                previousPoint = point
+            case .buttonUp:
+                if draw {
+                    window.draw { deviceContext in
+                        deviceContext.moveTo(previousPoint)
+                        deviceContext.lineTo(point)
+                    }
+                    draw = false
+                }
+            case .move:
+                if draw {
+                    window.draw { deviceContext in
+                        deviceContext.moveTo(previousPoint)
+                        deviceContext.lineTo(point)
+                    }
+                    previousPoint = point
+                }
+            default:
+                break
             }
         }
     }
